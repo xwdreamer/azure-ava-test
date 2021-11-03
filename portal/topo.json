@@ -1,0 +1,67 @@
+{
+  "@apiVersion": "1.1",
+  "name": "MotionDetection",
+  "properties": {
+    "description": "Analyzing live video to detect motion and emit events",
+    "parameters": [
+      {
+        "name": "rtspUrl",
+        "type": "string",
+        "description": "rtspUrl"
+      },
+      {
+        "name": "rtspUserName",
+        "type": "string",
+        "description": "rtspUserName",
+        "default": "dummyUserName"
+      },
+      {
+        "name": "rtspPassword",
+        "type": "string",
+        "description": "rtspPassword",
+        "default": "dummypw"
+      }
+    ],
+    "sources": [
+      {
+        "@type": "#Microsoft.VideoAnalyzer.RtspSource",
+        "name": "rtspSource",
+        "transport": "tcp",
+        "endpoint": {
+          "@type": "#Microsoft.VideoAnalyzer.UnsecuredEndpoint",
+          "credentials": {
+            "@type": "#Microsoft.VideoAnalyzer.UsernamePasswordCredentials",
+            "username": "${rtspUserName}",
+            "password": "${rtspPassword}"
+          },
+          "url": "${rtspUrl}"
+        }
+      }
+    ],
+    "processors": [
+      {
+        "@type": "#Microsoft.VideoAnalyzer.MotionDetectionProcessor",
+        "sensitivity": "medium",
+        "name": "motionDetection",
+        "inputs": [
+          {
+            "nodeName": "rtspSource",
+            "outputSelectors": []
+          }
+        ]
+      }
+    ],
+    "sinks": [
+      {
+        "hubOutputName": "inferenceOutput",
+        "@type": "#Microsoft.VideoAnalyzer.IotHubMessageSink",
+        "name": "iotHubSink",
+        "inputs": [
+          {
+            "nodeName": "motionDetection"
+          }
+        ]
+      }
+    ]
+  }
+}
